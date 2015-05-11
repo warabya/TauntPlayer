@@ -27,3 +27,5 @@ cache
 
 # Users Environment Variables
 .lock-wscript
+
+release

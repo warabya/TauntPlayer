@@ -5,6 +5,17 @@ plumber = require 'gulp-plumber'
 stylus = require 'gulp-stylus'
 jade = require 'gulp-jade'
 autoprefixer = require 'gulp-autoprefixer'
+electron = require 'gulp-electron'
+packageJson = require './dest/package.json'
+
+PACKAGEJSON_FILE = './src/package.json'
+
+gulp.task 'packagejson', ->
+  gulp.src PACKAGEJSON_FILE
+    .pipe gulp.dest './dest'
+
+gulp.task 'watch-packagejson', ->
+  gulp.watch PACKAGEJSON_FILE, ['packagejson']
 
 JADE_FILES = './src/jade/**/*.jade'
 
@@ -60,5 +71,19 @@ gulp.task 'images', ->
 gulp.task 'watch-images', ->
   gulp.watch IMAGE_FILES, ['images']
 
-gulp.task 'watch', ['watch-main-script', 'watch-jade', 'watch-coffee', 'watch-stylus', 'watch-images']
-gulp.task 'default', ['main-script', 'jade', 'coffee', 'stylus', 'images']
+gulp.task 'electron', ->
+  gulp.src ''
+    .pipe electron {
+      src: './dest'
+      packageJson: packageJson,
+      release: './release'
+      cache: './cache'
+      version: 'v0.25.2'
+      rebuild: true
+      platforms: ['win32-ia32', 'darwin-x64']
+    }
+    .pipe gulp.dest ''
+
+gulp.task 'watch', ['watch-packagejson', 'watch-main-script', 'watch-jade', 'watch-coffee', 'watch-stylus', 'watch-images']
+gulp.task 'default', ['packagejson', 'main-script', 'jade', 'coffee', 'stylus', 'images']
+gulp.task 'release', ['default', 'electron']
